@@ -1,0 +1,151 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\CoursesCode\\ComS437\\Reversi\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|c:\\coursescode\\coms437\\reversi\\assets\\scripts\\gamecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|solutionrelative:assets\\scripts\\gamecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|C:\\CoursesCode\\ComS437\\Reversi\\assets\\scripts\\gamepiece.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|solutionrelative:assets\\scripts\\gamepiece.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|C:\\CoursesCode\\ComS437\\Reversi\\assets\\scripts\\phantompiece.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|solutionrelative:assets\\scripts\\phantompiece.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|C:\\CoursesCode\\ComS437\\Reversi\\assets\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|solutionrelative:assets\\scripts\\playercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|C:\\CoursesCode\\ComS437\\Reversi\\assets\\scripts\\aicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|solutionrelative:assets\\scripts\\aicontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|C:\\CoursesCode\\ComS437\\Reversi\\assets\\scripts\\playagent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|solutionrelative:assets\\scripts\\playagent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|C:\\CoursesCode\\ComS437\\Reversi\\assets\\scripts\\reversiai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|solutionrelative:assets\\scripts\\reversiai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|C:\\CoursesCode\\ComS437\\Reversi\\assets\\scripts\\point.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B53B15D1-7F9A-5470-F711-F6B1EBEA00C9}|Assembly-CSharp.Player.csproj|solutionrelative:assets\\scripts\\point.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 4,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GamePiece.cs",
+              "DocumentMoniker": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\GamePiece.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GamePiece.cs",
+              "ToolTip": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\GamePiece.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GamePiece.cs",
+              "ViewState": "AQIAABgAAAAAAAAAAAAYwDoAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-04-03T01:43:51.002Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ReversiAI.cs",
+              "DocumentMoniker": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\ReversiAI.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\ReversiAI.cs",
+              "ToolTip": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\ReversiAI.cs",
+              "RelativeToolTip": "Assets\\Scripts\\ReversiAI.cs",
+              "ViewState": "AQIAAPoAAAAAAAAAAAAAwAsBAAAuAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-29T18:47:49.489Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AIController.cs",
+              "DocumentMoniker": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\AIController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\AIController.cs",
+              "ToolTip": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\AIController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\AIController.cs",
+              "ViewState": "AQIAAAUAAAAAAAAAAAAAwBwAAAAfAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-29T00:40:17.547Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PhantomPiece.cs",
+              "DocumentMoniker": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\PhantomPiece.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PhantomPiece.cs",
+              "ToolTip": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\PhantomPiece.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PhantomPiece.cs",
+              "ViewState": "AQIAAAsAAAAAAAAAAAAQwBkAAAAMAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-27T18:45:48.304Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "GameController.cs",
+              "DocumentMoniker": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\GameController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\GameController.cs",
+              "ToolTip": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\GameController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\GameController.cs",
+              "ViewState": "AQIAAP0AAAAAAAAAAADwvxMBAAA7AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-27T18:43:02.929Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "PlayAgent.cs",
+              "DocumentMoniker": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\PlayAgent.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayAgent.cs",
+              "ToolTip": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\PlayAgent.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PlayAgent.cs",
+              "ViewState": "AQIAADgAAAAAAAAAAAAmwCQAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-27T18:32:26.915Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PlayerController.cs",
+              "DocumentMoniker": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\PlayerController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\PlayerController.cs",
+              "ToolTip": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\PlayerController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\PlayerController.cs",
+              "ViewState": "AQIAACUAAAAAAAAAAAAAADsAAAApAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-27T17:46:11.875Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Point.cs",
+              "DocumentMoniker": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\Point.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Point.cs",
+              "ToolTip": "C:\\CoursesCode\\ComS437\\Reversi\\Assets\\Scripts\\Point.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Point.cs",
+              "ViewState": "AQIAAAYAAAAAAAAAAAAIwBwAAAAPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-27T23:42:19.122Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
