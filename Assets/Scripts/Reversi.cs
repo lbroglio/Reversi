@@ -203,13 +203,14 @@ public class ReversiMoveEvaluator
         //Iterate through every possible direction the can be traveled int
         for(int xDirec = -1; xDirec < 2; xDirec++)
         {
-            // Flag to track if an oppoents piece is encounterd
-            bool oppPiece = false;
+
 
             for(int yDirec = -1; yDirec < 2; yDirec++)
-            {   
+            {
+                // Flag to track if an oppoents piece is encounterd
+                bool oppPiece = false;
                 // Skip this iteration if both are zero
-                if(xDirec == 0 && yDirec == 0)
+                if (xDirec == 0 && yDirec == 0)
                 {
                     continue;
                 } 
@@ -335,11 +336,12 @@ public static class ReversiPlay
         //Make necessary captures in every direction
         for (int xDirec = -1; xDirec < 2; xDirec++)
         {
-            // Tracks pieces to flip by their locations
-            Queue<Point> toFlip = new Queue<Point>();
+            
 
             for (int yDirec = -1; yDirec < 2; yDirec++)
             {
+                // Tracks pieces to flip by their locations
+                Queue<Point> toFlip = new Queue<Point>();
 
                 // If both elements are zero skip this loop
                 if (xDirec == 0 && yDirec == 0)

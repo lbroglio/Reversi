@@ -4,11 +4,17 @@ using UnityEngine;
 
 public class GamePiece : MonoBehaviour
 {
+
+    /// <summary>
+    /// The number of game piesces which have fallen into place
+    /// </summary>
+    public static int PiecesInPlace = 0;
+
     //Location  of this GamePiece of the board (-1, -1) if offboard
     private Vector2 _postion;
 
     //Track whether this is in its initial fall state
-    private bool _initalFall = true;
+    public bool _initalFall = true;
 
     /// <summary>
     /// The current side this piece is showing
@@ -36,6 +42,19 @@ public class GamePiece : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// If the piece is not currently  the given color animate flipping to it
+    /// </summary>
+    /// <param name="color">The color to flip to. Nothing will happens if this is the current color</param>
+    public void FlipToColor(SpotState color)
+    {
+        if(_color != color)
+        {
+            _color = color;
+            GameController gc = GameObject.Find("GameController").GetComponent<GameController>();
+            gc.AddToAnim(this);
+        }
+    }
 
 
     void Awake()
@@ -53,7 +72,7 @@ public class GamePiece : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Switch to kinetic after falling
+
 
     }
 
@@ -63,7 +82,15 @@ public class GamePiece : MonoBehaviour
         // Switch to kinetic after falling
         if (_initalFall)
         {
+            if(PiecesInPlace == 0)
+            {
+                GameController gc = GameObject.Find("GameController").GetComponent<GameController>();
+                gc.RestingPlace = gameObject.transform.position;
+            }
+
             GetComponent<Rigidbody>().isKinematic = true;
+            PiecesInPlace++;
+            _initalFall=false;
         }
     }
 }

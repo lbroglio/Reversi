@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class GameController : MonoBehaviour, IObserver<ReversiMove>
 {
@@ -10,27 +13,37 @@ public class GameController : MonoBehaviour, IObserver<ReversiMove>
     /// </summary>
     struct AnimatedObject
     {
+
+        public enum AnimType
+        {
+            MOVE,
+            FLIP
+        }
+
         public MonoBehaviour ToAnimate;
         public SpotState EndColor;
         public Vector3 MovingTo;
-        public Vector3 ArcTop;
-        public Vector3 DistPerArc;
+        public Vector3 Step;
+        public AnimType Type;
+        public Quaternion CachedRot;
+        public float TotalRot;
 
-        public AnimatedObject(MonoBehaviour g, Vector3 p, SpotState c)
+        public AnimatedObject(MonoBehaviour g, Vector3 p, SpotState c,  AnimType t)
         {
             ToAnimate = g;
             MovingTo = p;
 
             Vector3 dist = p - ToAnimate.transform.position;
-            float xMid = ToAnimate.transform.position.x - dist.x;
-            float zMid =  ToAnimate.transform.position.z - dist.z;
-
-            ArcTop = new Vector3 (xMid, 3, zMid);
-
-            DistPerArc = new Vector3 (dist.x / 2, 3, dist.z / 2);
 
             EndColor = c;
 
+            Step = new Vector3(dist.x * 2.5f, 0, dist.z * 2.5f);
+
+            Type = t;
+
+            CachedRot = Quaternion.Euler(g.transform.rotation.eulerAngles.x, g.transform.rotation.eulerAngles.y,g.transform.rotation.eulerAngles.z);
+
+            TotalRot = 0;
         }
     }
 
@@ -94,6 +107,32 @@ public class GameController : MonoBehaviour, IObserver<ReversiMove>
     /// </summary>
     private PlayAgent _offPlayer;
 
+    /// <summary>
+    /// Set to true when the game ends
+    /// </summary>
+    private bool gameOver = false;
+
+    /// <summary>
+    /// Holds the winner of the game. Empty means the game is tied
+    /// </summary>
+    private SpotState _gameWinner;
+
+    /// <summary>
+    /// The object currently being animated
+    /// </summary>
+    private AnimatedObject _beingAnimated;
+
+    /// <summary>
+    /// Vector where the piece at the bottom is located
+    /// </summary>
+    public Vector3 RestingPlace;
+
+    private bool needNewAnim = true;
+
+    /// <summary>
+    /// Used to track when a pass message should be ended
+    /// </summary>
+    private bool _passFlag = false;
 
     public PlayAgent CurrentPlayer
     {
@@ -200,7 +239,9 @@ public class GameController : MonoBehaviour, IObserver<ReversiMove>
         _board[boardLocation.X, boardLocation.Y] = toPlay;
 
         // Add piece to animation queue
-        _animQueue.Enqueue(new AnimatedObject(toPlay, coords, color));
+        _currPlayerAnim = _currentPlayer;
+        _currentPlayer = null;
+        _animQueue.Enqueue(new AnimatedObject(toPlay, coords, color, AnimatedObject.AnimType.MOVE));
 
         //Return true because piece has been set up for being placed
         return true;
@@ -239,13 +280,11 @@ public class GameController : MonoBehaviour, IObserver<ReversiMove>
 
 
 
-        Vector3 shootPos = GameObject.Find("ShootMarker").transform.position;
-        Vector3 shootPos2 = GameObject.Find("ShootMarker1").transform.position;
+        Vector3 spawnPos = GameObject.Find("ShootMarker").transform.position;
         // Create pieces 
-        for (int i =0; i < 64; i+=2)
+        for (int i =0; i < 130; i+=2)
         {
-            _pieceList.Enqueue(Instantiate(gamePiece, new Vector3(shootPos.x, 3 + i, shootPos.z), Quaternion.identity));
-            _pieceList.Enqueue(Instantiate(gamePiece, new Vector3(shootPos2.x, 3 + i, shootPos2.z), Quaternion.identity));
+            _pieceList.Enqueue(Instantiate(gamePiece, new Vector3(spawnPos.x, 6 + i, spawnPos.z), Quaternion.identity));
 
         }
 
@@ -259,69 +298,210 @@ public class GameController : MonoBehaviour, IObserver<ReversiMove>
 
         // Set the current player at the start
         _currentPlayer = GameObject.Find("PlayerController").GetComponent<PlayerController>();
+        _currPlayerAnim = CurrentPlayer;
 
         //Add second player
         //TODO: THIS IS CURRENTLY ONLY A BOT NEED TO IMPLEMENT OPTION TO ADD SECOND PLAYER
         _offPlayer = Instantiate(AIController).GetComponent<AIController>();
 
+        //TODO ADD USER CONFIGURATION
+        _offPlayer.GetComponent<AIController>().MaxDepth = Config.AIDifficult;
+
         //Subscribe to the Players
         PlayerController player = GameObject.Find("PlayerController").GetComponent<PlayerController>();
         player.Subscribe(this);
         _offPlayer.Subscribe(this);
+
+        if(Config.PlayerColor == SpotState.WHITE)
+        {
+            _currentPlayer.Color = SpotState.WHITE; 
+            _offPlayer.Color = SpotState.BLACK;
+        }
+        else
+        {
+            PlayAgent tmp = _currentPlayer;
+            tmp.Color = SpotState.BLACK;
+
+            _currentPlayer = _offPlayer;
+            _offPlayer.Color = SpotState.WHITE;
+
+            _offPlayer = tmp;
+            _currPlayerAnim = CurrentPlayer;
+
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        //Wait for all of the game pieces to be ready
+        if (GamePiece.PiecesInPlace < 65)
+        {
+            _currentPlayer = null;
+            return;
+        }
+
+
+
+        // Setup
         // Wait for all pieces to be in place to start play
         // If currently animating
-        if(_animQueue.Count > 0)
+        if (_animQueue.Count > 0 || needNewAnim == false)
         {
-            _currPlayerAnim = _currentPlayer;
-            _currentPlayer = null;
-
             //Continue animating the top element in the queue
-            AnimatedObject ob = _animQueue.Peek();
-
-            // If on the upslope 
-            if(ob.ToAnimate.transform.position.x < ob.ArcTop.x)
+            if(needNewAnim)
             {
-                float xPos = ob.ToAnimate.transform.position.x + (ob.DistPerArc.x * Time.deltaTime);
-                float yPos = 0.3f * (xPos * xPos);
-                float zPos = ob.ToAnimate.transform.position.z + (ob.DistPerArc.z * Time.deltaTime);
-
-                ob.ToAnimate.transform.position = new Vector3(xPos, yPos, zPos);
+                _beingAnimated = _animQueue.Dequeue();
+                needNewAnim = false;
             }
-            // If on the downslope
-            else if(ob.ToAnimate.transform.position.x < ob.MovingTo.x)
+
+            // If ob is a moving type animation
+            if (_beingAnimated.Type == AnimatedObject.AnimType.MOVE)
             {
-                float xPos = ob.ToAnimate.transform.position.x + (ob.DistPerArc.x * Time.deltaTime);
-                float yPos = 0.3f * (-1 * (xPos * xPos)) + 3;
-                float zPos = ob.ToAnimate.transform.position.z + (ob.DistPerArc.z * Time.deltaTime);
+                Vector3 dist = _beingAnimated.MovingTo - _beingAnimated.ToAnimate.transform.position;
+                // If still moving to the spot
+                if ((Math.Abs(dist.x) > 0.075 && Math.Abs(dist.z) > 0.075) && /*Fallback if piece isn't stopped*/ Math.Abs(dist.x) < 15)
+                {
+                    // Calculate step for each
+                    float xStep = _beingAnimated.Step.x * Time.deltaTime;
+                    float zStep = _beingAnimated.Step.z * Time.deltaTime;
 
-                ob.ToAnimate.transform.position = new Vector3(xPos, yPos, zPos);
+                    // Advance
+                    float xPos = _beingAnimated.ToAnimate.transform.position.x + xStep;
+                    float yPos = _beingAnimated.ToAnimate.transform.position.y;
+                    float zPos = _beingAnimated.ToAnimate.transform.position.z + zStep;
+
+                    _beingAnimated.ToAnimate.transform.position = new Vector3(xPos, yPos, zPos);
+                }
+                // If the spot is reached
+                else
+                {
+                    // Set  rotation  and  switch to non-kinematic
+
+                    // Snap to position
+                    _beingAnimated.ToAnimate.transform.position = new Vector3(_beingAnimated.MovingTo.x, _beingAnimated.ToAnimate.transform.position.y, _beingAnimated.MovingTo.z);
+                    _beingAnimated.ToAnimate.GetComponent<GamePiece>().Color = _beingAnimated.EndColor;
+
+                    _beingAnimated.ToAnimate.GetComponent<Rigidbody>().isKinematic = false;
+
+                }
+
+                // Dequeue when at the board
+                if (_beingAnimated.ToAnimate.transform.position.y <= 2.1)
+                {
+                    // Reset being animated 
+                    needNewAnim = true;
+                }
             }
-            // If directly above  the  spot
+            // If this is a flip type animation
             else
             {
-                // Set  rotation  and  switch to non-kinematic
-                ob.ToAnimate.transform.rotation = Quaternion.Euler(0, 0, 0);
-                ob.ToAnimate.GetComponent<GamePiece>().Color = ob.EndColor;
+                float amtRotated = _beingAnimated.ToAnimate.transform.rotation.eulerAngles.z - _beingAnimated.CachedRot.eulerAngles.z;
 
-                ob.ToAnimate.GetComponent<Rigidbody>().isKinematic = false;
+                //Set y shift based on whether over or below 90 degress of rotation 
+                float yShift = 0.5f * 2 * Time.deltaTime;
 
-                //Remove  from anim queue
-                _animQueue.Dequeue();
+                if(_beingAnimated.TotalRot >= 90)
+                {
+                    yShift *= -1;
+                }
+
+
+                //Move piece
+                float xPos = _beingAnimated.ToAnimate.transform.position.x;
+                float yPos = _beingAnimated.ToAnimate.transform.position.y + yShift;
+                float zPos = _beingAnimated.ToAnimate.transform.position.z;
+
+                _beingAnimated.ToAnimate.transform.position = new Vector3(xPos, yPos, zPos);
+
+                //Rotate piece
+                float amtToRotate = (180 * 2 * Time.deltaTime);
+                
+                //Rotation values
+                float xRot = _beingAnimated.ToAnimate.transform.rotation.eulerAngles.x;
+                float yRot = _beingAnimated.ToAnimate.transform.rotation.eulerAngles.y;
+                float zRot = _beingAnimated.ToAnimate.transform.rotation.eulerAngles.z;
+
+                _beingAnimated.ToAnimate.transform.rotation = Quaternion.Euler(xRot, yRot, zRot + amtToRotate);
+                _beingAnimated.TotalRot += amtToRotate;
+                // If this piece has been rotated 
+                if (_beingAnimated.TotalRot >= 180)
+                {
+                   // Snap rotation and position
+                   _beingAnimated.ToAnimate.transform.rotation = Quaternion.Euler(new Vector3(_beingAnimated.CachedRot.eulerAngles.x, _beingAnimated.CachedRot.eulerAngles.y, _beingAnimated.CachedRot.eulerAngles.z + 180));
+                   _beingAnimated.ToAnimate.transform.position = new Vector3(_beingAnimated.ToAnimate.transform.position.x, 2.1f, _beingAnimated.ToAnimate.transform.position.z);
+                   _beingAnimated.ToAnimate.GetComponent<Rigidbody>().isKinematic = false;
+
+                    // Flag to Reset being animated 
+                    needNewAnim = true;
+                }
             }
 
+
             //If anim queue is empty return control to player 
-            if(_animQueue.Count == 0)
+            if (_animQueue.Count == 0 && needNewAnim)
             {
                 _currentPlayer = _currPlayerAnim;
+                _currPlayerAnim = null;
             }
 
         }
+
+        // If the game is won
+        if (gameOver)
+        {
+            // Display end text
+            GameObject winText = GameObject.Find("WinnerDisplay");
+            //Set message based on outcome
+            if (_gameWinner == SpotState.WHITE)
+            {
+                winText.GetComponent<TextMeshPro>().text = "White Wins!";
+            }
+            else if (_gameWinner == SpotState.BLACK)
+            {
+                winText.GetComponent<TextMeshPro>().text = "Black Wins!";
+
+            }
+            else
+            {
+                winText.GetComponent<TextMeshPro>().text = "Tie Game!";
+
+            }
+            winText.GetComponent<MeshRenderer>().enabled = true;
+
+            System.Random rand  = new System.Random();
+            // Flip a piece at random
+            int ran1 = rand.Next(7);
+            int ran2 = rand.Next(7);
+
+            if (_boardState[ran1, ran2] != SpotState.EMPTY)
+            {
+                AddToAnim(_board[ran1, ran2]);
+            }
+
+
+        }
     }
+
+    /// <summary>
+    /// Drop all of the pieces still in the dispenser
+    /// </summary>
+    private void dropPiece()
+    {
+        _pieceList.Peek().transform.position = RestingPlace;
+    }
+
+    /// <summary>
+    /// When called a game piece will be added to the animation queue for rotation
+    /// </summary>
+    /// <param name="gp">The GamePiece to add</param>
+    public void AddToAnim(GamePiece gp)
+    {
+        gp.GetComponent<Rigidbody>().isKinematic = true;
+        AnimatedObject ao = new AnimatedObject(gp, Vector3.zero, SpotState.EMPTY, AnimatedObject.AnimType.FLIP);
+        _animQueue.Enqueue(ao);
+    }
+
 
     // As of right now these do nothing
     public void OnCompleted()
@@ -335,30 +515,135 @@ public class GameController : MonoBehaviour, IObserver<ReversiMove>
     //Perform a signaled move
     public void OnNext(ReversiMove value)
     {
-        // Place piece object on the on screen board
-        PlacePiece(value.PlaceLoc, value.Color);
-
-        //Make the move on the board simulating the game
-        _boardState = ReversiPlay.MakeMove(value, _boardState);
-
-        // Match board state to the games
-        for(int i = 0; i < 8; i++)
+        // Undo pass if necessary
+        if(_passFlag)
         {
-            for(int j = 0; j < 8; j++)
+            GameObject player = GameObject.Find("PlayerController");
+            if(_currentPlayer == player.GetComponent<PlayerController>() && value != null)
             {
-                // If this is a piece
-                if (_boardState[i,j] != SpotState.EMPTY)
-                {
-                    // Match state of this square
-                    //TODO -- ADD ANIMATION
-                    _board[i, j].Color = _boardState[i, j];
-                }
+                GameObject text = GameObject.Find("WinnerDisplay");
+                text.GetComponent<MeshRenderer>().enabled = false;
+                _passFlag = false;
+
             }
+
         }
+
 
         // Swap the player
         PlayAgent tmp = _currentPlayer;
         _currentPlayer = _offPlayer;
         _offPlayer = tmp;
+
+
+        // If this move is a pass
+        if(value == null)
+        {
+            Debug.Log("Move Passed");
+            // Notify user of pass
+            GameObject text = GameObject.Find("WinnerDisplay");
+
+            if(_offPlayer.Color == SpotState.WHITE)
+            {
+                text.GetComponent<TextMeshPro>().text = "White Passes";
+
+            }
+            else
+            {
+                text.GetComponent<TextMeshPro>().text = "Black Passes";
+
+            }
+
+            text.GetComponent<MeshRenderer>().enabled = true;
+
+
+            // End function
+            _passFlag = true;
+        }
+        else
+        {
+            // Place piece object on the on screen board
+            PlacePiece(value.PlaceLoc, value.Color);
+
+            dropPiece();
+
+            //Make the move on the board simulating the game
+            _boardState = ReversiPlay.MakeMove(value, _boardState);
+
+            // Match board state to the games
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    // If this is a piece
+                    if (_boardState[i, j] != SpotState.EMPTY)
+                    {
+                        // If this isn't the piece being added
+                        if (i != value.PlaceLoc.X || j != value.PlaceLoc.Y)
+                        {
+                            // Match state of this square
+                            _board[i, j].FlipToColor(_boardState[i, j]);
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+        //Check if a legal move exists in the new state
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                // If any player can make a legal move at this position
+                ReversiMove m1 = new ReversiMove(new Point(i, j), SpotState.WHITE);
+                ReversiMove m2 = new ReversiMove(new Point(i, j), SpotState.BLACK);
+                ReversiMoveEvaluator e1 = new ReversiMoveEvaluator(BoardState);
+                ReversiMoveEvaluator e2 = new ReversiMoveEvaluator(BoardState);
+                if (e1.CheckMoveLegal(m1) || e2.CheckMoveLegal(m2)) 
+                {
+                    return;
+                }
+            }
+        }
+
+        Debug.Log("GAME OVER");
+        // Evaluate winner
+        int whitePieces = 0;
+        int blackPieces = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (BoardState[i, j] == SpotState.WHITE)
+                {
+                    whitePieces++;
+                }
+                else if (BoardState[i, j] == SpotState.BLACK)
+                {
+                    blackPieces++;
+                }
+
+            }
+        }
+
+        //Set winner vals
+        gameOver = true;
+        if (whitePieces > blackPieces)
+        {
+            _gameWinner = SpotState.WHITE;
+        }
+        else if (blackPieces > whitePieces)
+        {
+            _gameWinner = SpotState.BLACK;
+        }
+        else
+        {
+            _gameWinner = SpotState.EMPTY;
+        }
+
+
     }
 }

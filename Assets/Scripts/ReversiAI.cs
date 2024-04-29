@@ -115,7 +115,7 @@ public class ReversiAI
     /// <param name="board">The board to choose a move on</param>
     /// <param name="currLayer">How many moves ahead the move being chosen is</param>
     /// <param name="color">The color that is making the next move</param>
-    private (ReversiMove, int) MiniMax(ReversiBoard board, int currLayer, SpotState color)
+    private (ReversiMove, int) MiniMax(ReversiBoard board, int currLayer, SpotState color, int alpha, int beta)
     {
         // Track whether this is a max or min levrl
         bool isMax = true;
@@ -228,7 +228,7 @@ public class ReversiAI
 
                 if (isMax)
                 {
-                    (ReversiMove, int) recVal = MiniMax(cpy, currLayer + 1, oppColor);
+                    (ReversiMove, int) recVal = MiniMax(cpy, currLayer + 1, oppColor, alpha, beta);
 
                     // If this move beats the current max track it 
                     if(trackedVal < recVal.Item2)
@@ -237,16 +237,32 @@ public class ReversiAI
                         trackedMove = pair.Item1;
                     }
 
+                    // Set alpha value
+                    alpha = Mathf.Max(alpha, trackedVal);
+
+                    //If beta is less than alpha prune 
+                    if(beta <= alpha)
+                    {
+                        break;
+                    }
+
                 }
                 else
                 {
-                    (ReversiMove, int) recVal = MiniMax(cpy, currLayer + 1, _color);
+                    (ReversiMove, int) recVal = MiniMax(cpy, currLayer + 1, _color, alpha, beta);
 
                     // If this move is less than the current min track it
                     if (trackedVal > recVal.Item2)
                     {
                         trackedVal = recVal.Item2;
                         trackedMove = pair.Item1;
+                    }
+
+                    //Set beta val
+                    beta = Mathf.Min(beta, trackedVal);
+                    if(beta <= alpha)
+                    {
+                        break;
                     }
 
                 }
@@ -265,7 +281,7 @@ public class ReversiAI
     public ReversiMove ChooseMove(ReversiBoard board)
     {
         // Call MiniMax algorithm
-        return MiniMax(board, 0, _color).Item1;
+        return MiniMax(board, 0, _color, int.MinValue, int.MaxValue).Item1;
     }
 
     public ReversiAI(int maxDepth, SpotState color)
